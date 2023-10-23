@@ -44,6 +44,8 @@ std::vector<std::string> HashMapConcurrente::claves() {
             claves.push_back(element.first);
         }
     }
+
+    return claves;
 }
 
 unsigned int HashMapConcurrente::valor(std::string clave) {
