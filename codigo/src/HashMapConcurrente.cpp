@@ -19,6 +19,21 @@ unsigned int HashMapConcurrente::hashIndex(std::string clave) {
 
 void HashMapConcurrente::incrementar(std::string clave) {
     // Completar (Ejercicio 2)
+    unsigned int bucketIndex = hashIndex(clave);
+    mutexes[bucketIndex].lock();
+    incrementarEnLista(tabla[bucketIndex], clave);
+    mutexes[bucketIndex].unlock();
+}
+
+void HashMapConcurrente::incrementarEnLista(ListaAtomica<hashMapPair> *lista, std::string clave) {
+    for (auto& element: *lista) {
+        if(element.first == clave){ // Si la clave ya existe la incrementamos
+            element.second++;
+            return;
+        }
+    }
+    // Si no esta la clave se agrega
+    lista->insertar(std::make_pair(clave, 1));
 }
 
 std::vector<std::string> HashMapConcurrente::claves() {

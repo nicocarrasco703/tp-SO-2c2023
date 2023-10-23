@@ -24,8 +24,12 @@ class HashMapConcurrente {
     hashMapPair maximo();
     hashMapPair maximoParalelo(unsigned int cantThreads);
 
+    void incrementarEnLista(ListaAtomica<hashMapPair> *lista, std::string clave);
+
  private:
     ListaAtomica<hashMapPair> *tabla[HashMapConcurrente::cantLetras];
+
+    std::mutex mutexes[HashMapConcurrente::cantLetras];
 
     static unsigned int hashIndex(std::string clave);
 };
