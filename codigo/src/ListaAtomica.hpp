@@ -33,11 +33,7 @@ class ListaAtomica {
         // Completar (Ejercicio 1)
         Nodo *nuevo = new Nodo(valor);
         nuevo->_siguiente = _cabeza.load();
-        while(true){
-            if(_cabeza.compare_exchange_weak(nuevo->_siguiente, nuevo)){
-                break;
-            }
-        }
+        _cabeza.compare_exchange_strong(nuevo->_siguiente, nuevo);
     }
 
     T& operator[](size_t i) const {

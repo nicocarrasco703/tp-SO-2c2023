@@ -20,9 +20,9 @@ unsigned int HashMapConcurrente::hashIndex(std::string clave) {
 void HashMapConcurrente::incrementar(std::string clave) {
     // Completar (Ejercicio 2)
     unsigned int bucketIndex = hashIndex(clave);
-    mutexes[bucketIndex].lock();
+    accesoBucket[bucketIndex].lock();
     incrementarEnLista(tabla[bucketIndex], clave);
-    mutexes[bucketIndex].unlock();
+    accesoBucket[bucketIndex].unlock();
 }
 
 void HashMapConcurrente::incrementarEnLista(ListaAtomica<hashMapPair> *lista, std::string clave) {
@@ -52,11 +52,15 @@ unsigned int HashMapConcurrente::valor(std::string clave) {
     // Completar (Ejercicio 2)
     auto *lista = tabla[hashIndex(clave)]; // Lista de la clave.
 
+    accesoBucket[hashIndex(clave)].lock();
     for(const auto& element :*lista){
         if(element.first == clave){
-            return element.second;
+            auto res = element.second;
+            accesoBucket[hashIndex(clave)].unlock();
+            return res;
         }
     }
+    accesoBucket[hashIndex(clave)].unlock();
     return 0; //En caso de no encontrar, se devuelve 0.
 }
 
@@ -69,14 +73,14 @@ hashMapPair HashMapConcurrente::maximo() {
 
     for (unsigned int index = 0; index < HashMapConcurrente::cantLetras; index++) {
         // Bloquear solo la entrada correspondiente
-        mutexes[index].lock();
+        accesoBucket[index].lock();
         for (auto &p : *tabla[index]) {
             if (p.second > max->second) {
                 max->first = p.first;
                 max->second = p.second;
             }
         }
-        mutexes[index].unlock();
+        accesoBucket[index].unlock();
     }
 
     return *max;
@@ -86,7 +90,7 @@ hashMapPair HashMapConcurrente::maximo() {
 
 hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cant_threads) {
     // Completar (Ejercicio 3)
-    for(auto& mut: mutexes){
+    for(auto& mut: accesoBucket){
         mut.lock();
     }
 
@@ -104,7 +108,7 @@ hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cant_threads) {
         t.join();
     }
 
-    for(auto& mtx: mutexes){
+    for(auto& mtx: accesoBucket){
         mtx.unlock();
     }
 
