@@ -24,6 +24,10 @@ class HashMapConcurrente {
     hashMapPair maximo();
     hashMapPair maximoParalelo(unsigned int cantThreads);
 
+    void buscarMaximoThread(std::atomic<int>* idxActual, hashMapPair *maximoActual, std::mutex *mtx_maximo);
+
+    hashMapPair maximoLista(int index);
+
     void incrementarEnLista(ListaAtomica<hashMapPair> *lista, std::string clave);
 
  private:

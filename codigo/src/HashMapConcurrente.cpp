@@ -60,7 +60,14 @@ unsigned int HashMapConcurrente::valor(std::string clave) {
     return 0; //En caso de no encontrar, se devuelve 0.
 }
 
+//Habria que ver si al pedir que no sea bloqueante, deberiamos buscar el maximo de todas las listas de una vez o tipo ir
+// cerrando los mutex cada vez que busco en una lista, y asi ir las desbloqueando. Si es asi deberiamos cambiarlo
+// tambien en maximo paralelo. La diferencia estaria en que liberariamos el mutex de la letra, en cada ciclo.
 hashMapPair HashMapConcurrente::maximo() {
+    for(auto& mtx: mutexes){
+        mtx.lock();
+    }
+
     hashMapPair *max = new hashMapPair();
     max->second = 0;
 
@@ -73,6 +80,10 @@ hashMapPair HashMapConcurrente::maximo() {
         }
     }
 
+    for(auto& mtx: mutexes){
+        mtx.unlock();
+    }
+
     return *max;
 }
 
@@ -80,6 +91,66 @@ hashMapPair HashMapConcurrente::maximo() {
 
 hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cant_threads) {
     // Completar (Ejercicio 3)
+    for(auto& mut: mutexes){
+        mut.lock();
+    }
+
+    std::atomic<int> idxActual(0);
+    auto *maximoActual = new hashMapPair();
+    maximoActual->second = 0;
+    std::mutex mtx_maximo;
+    std::vector<std::thread> threads(cant_threads);
+
+    for (auto& t: threads) {
+        t = std::thread(&HashMapConcurrente::buscarMaximoThread, this , &idxActual, maximoActual, &mtx_maximo);
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    for(auto& mtx: mutexes){
+        mtx.unlock();
+    }
+
+    return *maximoActual;
+
+}
+
+void HashMapConcurrente::buscarMaximoThread(std::atomic<int> *idxActual, hashMapPair *maximoActual,
+                                            std::mutex *mtx_maximo) {
+
+    while(*idxActual < HashMapConcurrente::cantLetras){
+        int index = (*idxActual).fetch_add(1);
+        if(index >= HashMapConcurrente::cantLetras) {
+            break; //En caso de que de alguna forma, al sumar, superen cantletras.
+        }
+        //Busco el maximo de la lista.
+        hashMapPair max = HashMapConcurrente::maximoLista(index);
+
+        //Actualizo el maximo.
+        mtx_maximo->lock();
+        if(max.second > maximoActual->second){
+            maximoActual->first = max.first;
+            maximoActual->second = max.second;
+        }
+        mtx_maximo->unlock();
+    }
+
+}
+// Metodo para obtener el maximo de una lista.
+hashMapPair HashMapConcurrente::maximoLista(int index) {
+    auto *max = new hashMapPair();
+    max->second = 0;
+
+    for (auto &p : *tabla[index]) {
+        if (p.second > max->second) {
+            max->first = p.first;
+            max->second = p.second;
+        }
+    }
+
+    return *max;
 }
 
 #endif
