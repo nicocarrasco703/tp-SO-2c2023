@@ -64,24 +64,19 @@ unsigned int HashMapConcurrente::valor(std::string clave) {
 // cerrando los mutex cada vez que busco en una lista, y asi ir las desbloqueando. Si es asi deberiamos cambiarlo
 // tambien en maximo paralelo. La diferencia estaria en que liberariamos el mutex de la letra, en cada ciclo.
 hashMapPair HashMapConcurrente::maximo() {
-    for(auto& mtx: mutexes){
-        mtx.lock();
-    }
-
     hashMapPair *max = new hashMapPair();
     max->second = 0;
 
     for (unsigned int index = 0; index < HashMapConcurrente::cantLetras; index++) {
+        // Bloquear solo la entrada correspondiente
+        mutexes[index].lock();
         for (auto &p : *tabla[index]) {
             if (p.second > max->second) {
                 max->first = p.first;
                 max->second = p.second;
             }
         }
-    }
-
-    for(auto& mtx: mutexes){
-        mtx.unlock();
+        mutexes[index].unlock();
     }
 
     return *max;
