@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <thread>
 
 #include "CargarArchivos.hpp"
 
@@ -23,6 +24,7 @@ int cargarArchivo(
     }
     while (file >> palabraActual) {
         // Completar (Ejercicio 4)
+        hashMap.incrementar(palabraActual);
         cant++;
     }
     // Cierro el archivo.
@@ -35,13 +37,33 @@ int cargarArchivo(
     return cant;
 }
 
-
 void cargarMultiplesArchivos(
     HashMapConcurrente &hashMap,
     unsigned int cantThreads,
     std::vector<std::string> filePaths
 ) {
     // Completar (Ejercicio 4)
+    std::atomic<int> indiceArchivo(0);
+    std::vector<std::thread> threads(cantThreads);
+
+    for (auto& t: threads) {
+        t = std::thread([&]{
+            while (indiceArchivo < filePaths.size()) {
+                int index = (indiceArchivo).fetch_add(1);
+                if (index >= filePaths.size()) {
+                    break;
+                }
+                cargarArchivo(hashMap, filePaths[index]);
+            }
+        });
+
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
 }
+
+
 
 #endif
