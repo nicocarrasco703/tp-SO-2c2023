@@ -37,19 +37,24 @@ void HashMapConcurrente::incrementarEnLista(ListaAtomica<hashMapPair> *lista, st
 }
 
 std::vector<std::string> HashMapConcurrente::claves() {
-    // Completar (Ejercicio 2)
+    for(auto& mut: accesoBucket){
+        mut.lock();
+    }
+
     std::vector<std::string> claves;
-    for(const auto& lista : tabla){
-        for(const auto& element : *lista){
-            claves.push_back(element.first);
+
+    for (unsigned int index = 0; index < HashMapConcurrente::cantLetras; index++) {
+        for (auto &p : *tabla[index]) {
+            claves.push_back(p.first);
         }
+        // Liberar la que ya fue inspeccionada
+        accesoBucket[index].unlock();
     }
 
     return claves;
 }
 
 unsigned int HashMapConcurrente::valor(std::string clave) {
-    // Completar (Ejercicio 2)
     auto *lista = tabla[hashIndex(clave)]; // Lista de la clave.
 
     accesoBucket[hashIndex(clave)].lock();
