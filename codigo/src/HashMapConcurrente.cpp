@@ -111,10 +111,6 @@ hashMapPair HashMapConcurrente::maximoParalelo(unsigned int cant_threads) {
         t.join();
     }
 
-    for(auto& mtx: accesoBucket){
-        mtx.unlock();
-    }
-
     return *maximoActual;
 
 }
@@ -137,6 +133,7 @@ void HashMapConcurrente::buscarMaximoThread(std::atomic<int> *idxActual, hashMap
             maximoActual->second = max.second;
         }
         mtx_maximo->unlock();
+        accesoBucket[index].unlock();
     }
 
 }
