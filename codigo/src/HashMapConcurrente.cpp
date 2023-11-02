@@ -70,16 +70,19 @@ unsigned int HashMapConcurrente::valor(std::string clave) {
 hashMapPair HashMapConcurrente::maximo() {
     hashMapPair *max = new hashMapPair();
     max->second = 0;
+    // Bloquear todas las entradas
+    for(auto& mut: accesoBucket){
+        mut.lock();
+    }
 
     for (unsigned int index = 0; index < HashMapConcurrente::cantLetras; index++) {
-        // Bloquear solo la entrada correspondiente
-        accesoBucket[index].lock();
         for (auto &p : *tabla[index]) {
             if (p.second > max->second) {
                 max->first = p.first;
                 max->second = p.second;
             }
         }
+        // Liberar la que ya fue inspeccionada
         accesoBucket[index].unlock();
     }
 
