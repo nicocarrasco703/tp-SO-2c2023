@@ -6,6 +6,7 @@ BUILD_DIR = ./build
 
 TARGET = ContarPalabras
 TEST_TARGET = UnitTests
+TEST_EXPER_TARGET = Experiment
 
 OBJECTS = HashMapConcurrente.o CargarArchivos.o
 
@@ -13,6 +14,8 @@ all: build $(BUILD_DIR)/$(TARGET)
 
 test: build $(BUILD_DIR)/$(TEST_TARGET)
 	$(BUILD_DIR)/$(TEST_TARGET)
+
+experiment: build $(BUILD_DIR)/$(TEST_EXPER_TARGET)
 
 $(BUILD_DIR)/%.o: src/%.cpp
 	@mkdir -p $(@D)
@@ -22,7 +25,7 @@ $(BUILD_DIR)/%: src/%.cpp $(OBJECTS:%=$(BUILD_DIR)/%)
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-.PHONY: all test build clean debug
+.PHONY: all test build clean debug experiment
 
 build:
 	@mkdir -p $(BUILD_DIR)
