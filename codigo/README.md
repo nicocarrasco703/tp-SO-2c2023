@@ -33,3 +33,19 @@
   verificando algunos aspectos básicos del funcionamiento del código.
   **No evalúan aspectos de concurrencia** y por lo tanto no brindan ninguna
   garantía de que el código escrito sea correcto.
+
+## Experimentacion
+* Para replicar los experimentos:
+    Requisitos: Python, Numpy, Matplotlib
+    1. Desde src/
+    ```
+    make experiment
+    ```
+    2. Desde el directorio Experimentacion/
+    Ejecutar:
+    ```
+    python experimento1.py
+    python experimento2.py
+    python experimento3.py
+    python experimento4.py
+    ```
