@@ -35,13 +35,14 @@
   garantía de que el código escrito sea correcto.
 
 ## Experimentacion
-* Para replicar los experimentos:
-    Requisitos: Python, Numpy, Matplotlib
+* Requisitos: Python, Numpy, Matplotlib
+* Instrucciones:
+
     1. Desde src/
     ```
     make experiment
     ```
-    2. Desde el directorio Experimentacion/
+    2. Desde src/Experimentacion/
     Ejecutar:
     ```
     python experimento1.py
