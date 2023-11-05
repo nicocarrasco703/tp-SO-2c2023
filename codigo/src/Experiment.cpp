@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
             tiemposMaximo[i]+= tiempoMax.count();
         }
-        tiemposMaximo[i] /= 5;
+        tiemposMaximo[i] /= 5; //Promedio de 5 corridas.
     }
     std::cout << "[ ";
     for (double i: tiemposMaximo)

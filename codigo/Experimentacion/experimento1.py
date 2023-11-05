@@ -2,67 +2,64 @@
     Se busca ver si dividiendo el trabajo
     en mayor cantidad de threads, los resultados son mas eficientes.
 
-    Para correr el script, primero es necesario crear el ejecutable ContarPalabras.
+    Para correr el script, primero es necesario crear el ejecutable experiment.
     Este se crea corriendo make en la carpeta principal.
 """
+
 import subprocess as sp
 import numpy as np
 
 # configuracion de plots
 from matplotlib import pyplot as plt
 import pandas as pd
+import ast
+from collections import Counter
+import string
 
 
-def tprun(threads_lectura, threads_maximo, cantArchivos):
-    iteraciones = 10
-    ejecutable = "../build/ContarPalabras"
+def runSourceCode(threads_lectura, threads_maximo, cantArchivos, archivos):
+    ejecutable = "../build/Experiment"
     comando = [ejecutable, str(threads_lectura), str(threads_maximo)]
-    comando.append("../data/english-words.txt")
-    print(comando)
-    promedio_archivos = []
-    promedio_max = []
-    for i in range(1,iteraciones):
-        res = sp.check_output(comando, encoding="utf8")
-        [tiempo_archivos, tiempo_max, _, _] = res.split()
-        promedio_archivos.append(float(tiempo_archivos))
-        promedio_max.append(float(tiempo_max))
-    return [np.ma.median(promedio_archivos), np.ma.median(promedio_max)]
 
-def scatterPlot(ejeY, ejeX, color, label):
+    for i in range(0, cantArchivos):
+        comando.append("../data/"+ archivos[i])
+    print(comando)
+    res = sp.check_output(comando, encoding="utf8")
+    print("Resultado de c++:")
+    print(res)
+    tiemposMaximos = ast.literal_eval(res)
+
+    return tiemposMaximos
+
+def scatterPlot(ejeY, ejeX, color, label,totalThreads):
     print("Plotting...")
     plt.figure(figsize=(12,12), dpi= 80)
-    
+
     plt.scatter(ejeX, ejeY, s=30, alpha=1, color=color)
 
-    plt.xticks(fontsize=15)
+    #plt.yticks(ejeY)
+    plt.xticks(np.arange(0, totalThreads+1, 1.0),fontsize=15)
     plt.yticks(fontsize=15)
     plt.title(label, fontdict={'size':20})
     plt.xlabel('Cantidad de threads', fontsize=20)
-
     plt.ylabel("Tiempo (s)", fontsize=20)
     plt.grid(linestyle='--')
- 
-    # plt.legend()
+    plt.legend()
     plt.savefig("../Graficos/grafico_"+label+".png")
-    plt.show()
 
+def experimentar():
 
-def experimento_variando_threads():
-    tiempos_archivos = []
-    tiempos_max = []
-    totalThreads = 5
-    for threads in range(1,totalThreads):
-        print("Corriendo con ", threads, " threads")
-        [tiempo_archivos, tiempo_max] = tprun(5, threads, 1)
-        tiempos_archivos.append(float(tiempo_archivos))
-        tiempos_max.append(float(tiempo_max))
+    totalThreads = 8 # Elegir el maximo de cantidad de threads
+    archivos = ["igualCantidadDePalabrasXLetra.txt"]# elegir con que archivo se busca experimentar
+
+    tiempos_max = runSourceCode(5,totalThreads,len(archivos), archivos) # devuelve una lista con los tiempos por cantidad de threads
     df = pd.DataFrame(data={
-        'CantThreads': range(1,totalThreads), 
-        'Archivos': tiempos_archivos,
+        'CantThreads': range(1,totalThreads+1),
         'Maximo': tiempos_max
     })
-    scatterPlot(df.Maximo, df.CantThreads, "red", "Calculo del maximo en paralelo para diccionario")
+    scatterPlot(df.Maximo, df.CantThreads, "red", "Tiempo de ejecucion de maximoParalelo - Archivo equitativo",totalThreads)
 
-experimento_variando_threads()
+
+experimentar()
 
     

@@ -40,6 +40,7 @@
 
     1. Desde src/
     ```
+    make
     make experiment
     ```
     2. Desde src/Experimentacion/

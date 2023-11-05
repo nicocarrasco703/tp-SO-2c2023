@@ -24,7 +24,7 @@ def tprun(threads_lectura, threads_maximo, cantArchivos):
     print(comando)
     promedio_archivos = []
     promedio_max = []
-    for i in range(1,iteraciones):
+    for i in range(1, iteraciones):
         res = sp.check_output(comando, encoding="utf8")
         [tiempo_archivos, tiempo_max, _ ,_] = res.split()
         promedio_archivos.append(float(tiempo_archivos))
@@ -46,8 +46,8 @@ def scatterPlot(ejeY, ejeX, color, label):
     plt.grid(linestyle='--')
  
     # plt.legend()
+    print("Saving...")
     plt.savefig("../Graficos/grafico_"+label+".png")
-    plt.show()
 
 
 def experimento_variando_threads():

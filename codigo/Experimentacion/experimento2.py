@@ -2,7 +2,6 @@
     Se busca analizar que sucede cuando no hay una distribucion equitativa en la letra inicial de las
     palabras.
 
-
     Para correr el script, primero es necesario crear el ejecutable Experiment.
     Este se crea corriendo "make Experiment" en la carpeta principal.
 """
@@ -47,48 +46,7 @@ def scatterPlot(ejeY, ejeX, color, label,totalThreads):
     plt.grid(linestyle='--')
     plt.legend()
     plt.savefig("../Graficos/grafico_"+label+".png")
-    plt.show()
 
-
-
-def generarArchivo():
-    palabras = []
-    for i in range(0, 1000):
-        palabras = palabras + list(string.ascii_lowercase)[3:10]
-
-    archivo = "wordset-experimento2-chico.txt"
-    with open("../data/"+archivo, 'w') as f:
-        for p in palabras:
-            f.write("%s\n" % p)
-
-def generarExperimento2():
-    palabras = []
-    archivo = "wordset-experimento2.txt"
-    with open("../data/"+archivo) as file:
-        while (line := file.readline().rstrip()):
-            palabras.append(line)
-
-    data =  Counter(s[0] for s in  palabras)
-    names = list(data.keys())
-    values = list(data.values())
-    plt.bar(range(len(data)), values, tick_label=names)
-    plt.show()
-
-
-def comparar():
-
-    archivos = ["english-words-recortado.txt"]
-    tiempos_max = runSourceCode(5,4,len(archivos), archivos)
-    tiempoDatasetGrande = tiempos_max[2];  #tiempo con 3 threads
-
-    archivos = ["wordset-experimento2-chico.txt"]
-    tiempos_max = runSourceCode(5,4,len(archivos), archivos)
-    tiempoDatasetChico= tiempos_max[0];  #tiempo con 1 threads
-
-    values = [tiempoDatasetGrande,tiempoDatasetChico ]
-
-    plt.bar(range(len(values)), values, tick_label=["Dataset Grande 3 threads","Dataset chico 1 thread"])
-    plt.show()
 
 def experimentar():
 
@@ -100,7 +58,7 @@ def experimentar():
         'CantThreads': range(1,totalThreads+1),
         'Maximo': tiempos_max
     })
-    scatterPlot(df.Maximo, df.CantThreads, "red", "Tiempo de ejecucion de maximoParalelo",totalThreads)
+    scatterPlot(df.Maximo, df.CantThreads, "red", "Tiempo de ejecucion de maximoParalelo - Archivo no equitativo",totalThreads)
 
 
 experimentar()
